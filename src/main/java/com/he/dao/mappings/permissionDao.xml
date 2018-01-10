@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.he.dao.PermissionDao">
+
+
+    <resultMap id="MenuMap" type="com.he.model.Permission">
+        <result property="id" column="permissionId"/>
+        <result property="code" column="permissionCode"/>
+        <result property="name" column="permissionName"/>
+        <result property="url" column="url"/>
+        <result property="permission" column="permission"/>
+        <result property="type" column="type"/>
+        <collection property="childrenNode" ofType="com.he.model.Permission">
+            <result property="id" column="childPermissionId"/>
+            <result property="code" column="childPermissionCode"/>
+            <result property="name" column="childPermissionName"/>
+            <result property="url" column="childUrl"/>
+            <result property="permission" column="childPermission"/>
+            <result property="type" column="childType"/>
+        </collection>
+    </resultMap>
+
+    <!--查询用户菜单列表-->
+    <select id="selectMenu" resultMap="MenuMap">
+        SELECT
+        p.id as permissionId,
+        p.code as permissionCode,
+        p.name as permissionName,
+        p.url,
+        p.permission,
+        p.type,
+        cp.id as childPermissionId,
+        cp.code as childPermissionCode,
+        cp.name as childPermissionName,
+        cp.url as childUrl,
+        cp.permission as childPermission,
+        cp.type as childType
+        from user u
+        LEFT JOIN user_role ur on ur.user_id=u.id
+        LEFT JOIN role r ON r.id=ur.role_id
+        LEFT JOIN role_permission rp ON rp.role_id=r.id
+        LEFT JOIN permission p ON p.id=rp.permission_id
+        LEFT JOIN permission cp ON cp.parent_id=p.id
+        WHERE p.type='2'
+        AND u.username=#{username}
+    </select>
+
+
+</mapper>
